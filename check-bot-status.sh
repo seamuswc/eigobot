@@ -5,7 +5,7 @@ echo "🔍 Checking bot status safely..."
 
 # Check if systemd service is running
 echo "📊 Systemd service status:"
-systemctl is-active thai-learning-bot
+systemctl is-active english-learning-bot
 
 # Count running instances
 INSTANCE_COUNT=$(ps aux | grep 'src/index.js' | grep -v grep | wc -l)
@@ -18,12 +18,12 @@ elif [ $INSTANCE_COUNT -gt 1 ]; then
   echo "🛑 Stopping extra instances..."
   pkill -f 'node.*src/index.js'
   sleep 2
-  systemctl restart thai-learning-bot
+  systemctl restart english-learning-bot
   echo "✅ Restarted service"
 else
   echo "❌ No bot instances running"
   echo "🚀 Starting service..."
-  systemctl start thai-learning-bot
+  systemctl start english-learning-bot
 fi
 
 # Health check

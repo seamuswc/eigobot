@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Thai Learning Bot - Fresh Deployment Script
+# English Learning Bot (EigoBot) - Fresh Deployment Script
 # This script wipes the server and deploys fresh
 
 SERVER_IP=${1:-"68.183.185.81"}
-APP_DIR="/opt/thai-learning-bot"
-SERVICE_NAME="thai-learning-bot"
+APP_DIR="/opt/english-learning-bot"
+SERVICE_NAME="english-learning-bot"
 
-echo "🧹 Wiping server and deploying fresh Thai Learning Bot to $SERVER_IP"
+echo "🧹 Wiping server and deploying fresh English Learning Bot (EigoBot) to $SERVER_IP"
 echo "⚠️  This will completely remove the existing installation!"
 
 # Upload files directly to server
@@ -67,21 +67,20 @@ ssh root@$SERVER_IP << EOF
     echo "⚠️  No local .env file found. Creating from template..."
     cat > .env << 'EOL'
 # Telegram Bot Configuration
-TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+TELEGRAM_BOT_TOKEN=8398725072:AAGGQTvGOx5EueDNTPQ8DU5BTYkH08Y90Zc
 
 # DeepSeek API
 DEEPSEEK_API_KEY=your-deepseek-api-key
 
 # TON Configuration
 TON_ADDRESS=your-ton-address
-TON_AMOUNT=1.0
 SUBSCRIPTION_DAYS=30
 
 # TON Console API Key
 TON_API_KEY=your-ton-console-api-key
 
 # Webhook Configuration
-WEBHOOK_BASE_URL=https://riansi.xyz
+WEBHOOK_BASE_URL=https://eigobot.com
 
 # Database
 DATABASE_PATH=./data/bot.db
@@ -91,7 +90,7 @@ PORT=3000
 NODE_ENV=production
 
 # Timezone
-TIMEZONE=Asia/Bangkok
+TIMEZONE=Asia/Tokyo
 EOL
     echo "⚠️  Please update .env file with your actual API keys!"
   fi
@@ -99,7 +98,7 @@ EOL
   # Create systemd service
   cat > /etc/systemd/system/$SERVICE_NAME.service << EOL
 [Unit]
-Description=Thai Learning Bot
+Description=English Learning Bot (EigoBot)
 After=network.target
 
 [Service]

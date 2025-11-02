@@ -1,13 +1,14 @@
-# Thai Learning Telegram Bot
+# English Learning Telegram Bot
 
-A Telegram bot that helps users learn Thai language through daily sentences and authentic content.
+A Telegram bot that helps Japanese speakers learn English through daily sentences and authentic content.
 
 ## 🎯 Features
 
-- **Daily Thai Sentences**: Get daily lessons at 9:00 AM ICT
+- **Daily English Sentences**: Get daily lessons at 9:00 AM JST
 - **TON Cryptocurrency Payments**: Subscribe with TON for 30 days
-- **5 Difficulty Levels**: From Beginner to Expert
-- **Authentic Content**: Practice with real Thai sentences
+- **5 Difficulty Levels**: From Very Basic to Advanced
+- **Authentic Content**: Practice with real English sentences
+- **Japanese Translations**: Clear Japanese translations and word-by-word breakdowns
 
 ## 🏗️ Architecture
 
@@ -49,7 +50,6 @@ DEEPSEEK_API_KEY=your_deepseek_api_key_here
 
 # TON Configuration
 TON_ADDRESS=your_ton_address_here
-TON_AMOUNT=1.0
 SUBSCRIPTION_DAYS=30
 
 # Database
@@ -58,7 +58,7 @@ DATABASE_PATH=./data/bot.db
 # Server
 PORT=3000
 NODE_ENV=development
-TIMEZONE=Asia/Bangkok
+  TIMEZONE=Asia/Tokyo
 ```
 
 ## 🚀 Deployment
@@ -88,23 +88,23 @@ Deploy to your server:
 
 ## 📱 Bot Commands
 
-- `/start` - Main menu with all options
-- `/help` - Help and instructions
+- `/start` - メインメニュー（すべてのオプション）
+- `/help` - ヘルプと説明
 
 ## 🎮 Button Functions
 
 ### Main Menu
-- **📚 Help** - Show help information
-- **📊 Status** - Show subscription status and current difficulty
-- **💳 Subscribe** - Subscribe with TON payment
-- **⚙️ Difficulty** - Change difficulty level
+- **📚 ヘルプ** - ヘルプ情報を表示
+- **📊 ステータス** - 購読ステータスと現在の難易度を表示
+- **💳 購読する** - TONで購読
+- **⚙️ 難易度** - 難易度を変更
 
 ### Difficulty Levels
-- **Level 1**: Beginner (1-3 words)
-- **Level 2**: Elementary (4-6 words)
-- **Level 3**: Intermediate (7-10 words)
-- **Level 4**: Advanced (11-15 words)
-- **Level 5**: Expert (16+ words)
+- **Level 1**: Very Basic (simple sentences)
+- **Level 2**: Basic (present tense)
+- **Level 3**: Intermediate (past/future tense)
+- **Level 4**: Advanced (complex sentences)
+- **Level 5**: Advanced (idioms, phrasal verbs)
 
 ## 🗄️ Database Schema
 
@@ -132,8 +132,8 @@ CREATE TABLE subscriptions (
 -- Sentences table
 CREATE TABLE sentences (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  thai_text TEXT NOT NULL,
-  english_translation TEXT,
+  english_text TEXT NOT NULL,
+  japanese_translation TEXT,
   difficulty_level INTEGER,
   word_breakdown TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -209,4 +209,12 @@ Database: Updated 1 rows for user 1302731344 to level 3
 
 ---
 
-**The bot is now ready for deployment with all critical bugs fixed!**
+**The bot is now ready for deployment as an English learning bot for Japanese speakers!**
+
+## 🌏 Language Features
+
+- **English Lessons**: Daily English sentences for Japanese speakers
+- **Japanese Translations**: Clear Japanese translations (日本語訳)
+- **Word Breakdowns**: English word → Japanese meaning → pronunciation (romaji)
+- **Japanese UI**: All bot messages are in Japanese (polite form: です/ます)
+- **English Content**: Lesson content remains in English for learning

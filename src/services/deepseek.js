@@ -9,19 +9,19 @@ class DeepSeekService {
     this.lastCacheDate = null; // Track when cache was last updated
   }
 
-  // Check if cache needs to be reset (8:00 AM ICT)
+  // Check if cache needs to be reset (8:00 AM JST)
   shouldResetCache() {
     const now = new Date();
-    const bangkokTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Bangkok"}));
-    const currentHour = bangkokTime.getHours();
-    const currentDate = bangkokTime.toDateString();
+    const japanTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Tokyo"}));
+    const currentHour = japanTime.getHours();
+    const currentDate = japanTime.toDateString();
     
-    // Reset cache at 8:00 AM ICT or if it's a new day after 8 AM
+    // Reset cache at 8:00 AM JST or if it's a new day after 8 AM
     const shouldReset = (currentHour >= 8 && this.lastCacheDate !== currentDate) || 
                        (this.lastCacheDate && this.lastCacheDate !== currentDate);
     
     if (shouldReset) {
-      console.log('🔄 8:00 AM ICT detected, resetting sentence cache');
+      console.log('🔄 8:00 AM JST detected, resetting sentence cache');
       this.sentenceCache = {};
       this.lastCacheDate = currentDate;
       return true;
@@ -30,7 +30,7 @@ class DeepSeekService {
   }
 
   // Get cached sentence or generate new one
-  async generateThaiSentence(difficultyLevel, retryCount = 0) {
+  async generateEnglishSentence(difficultyLevel, retryCount = 0) {
     // Check if cache needs reset
     this.shouldResetCache();
     
@@ -44,27 +44,28 @@ class DeepSeekService {
     
     try {
       const levelInfo = config.DIFFICULTY_LEVELS[difficultyLevel];
-      const prompt = `Generate a Thai sentence for language learning at ${levelInfo.name} level (${levelInfo.description}). 
+      const prompt = `Generate an English sentence for Japanese speakers learning English at ${levelInfo.name} level (${levelInfo.description}). 
       The sentence should be:
-      - In Thai script
-      - Include English translation
+      - In English
+      - Include Japanese translation (日本語訳)
       - Be appropriate for the difficulty level
       
-      
       For word_breakdown, provide an array of objects with:
-      - word: the individual Thai word (break down into separate words, not phrases)
-      - meaning: English meaning
-      - pinyin: Thai romanization/pronunciation (MUST include this field with proper Thai romanization like "chan", "chop", "gin", etc.)
+      - word: the individual English word
+      - meaning: Japanese meaning (日本語の意味)
+      - pinyin: English pronunciation in romaji (ローマ字表記)
       
       IMPORTANT: Break down into individual words. For example:
-      - "ดื่มกาแฟ" (drinking coffee) should be broken down as "ดื่ม" (drink) + "กาแฟ" (coffee)
-      - "ไปโรงเรียน" (go to school) should be broken down as "ไป" (go) + "โรงเรียน" (school)
-      - "สวัสดีครับ" (hello sir) should be broken down as "สวัสดี" (hello) + "ครับ" (sir)
+      - "I like to eat pizza." should be broken down as:
+        - "I" (私 - watashi)
+        - "like" (好き - suki)
+        - "to eat" (食べる - taberu)
+        - "pizza" (ピザ - piza)
       
-      Try to not use similiar sentences over and over again.
+      Try to not use similar sentences over and over again.
       Use a variety of sentences to keep the learning experience interesting.
 
-      Format the response as JSON with fields: thai_text, english_translation, word_breakdown`;
+      Format the response as JSON with fields: english_text, japanese_translation, word_breakdown`;
 
       const response = await axios.post(this.apiUrl, {
         model: 'deepseek-chat',
@@ -101,35 +102,30 @@ class DeepSeekService {
         
         const parsed = JSON.parse(cleanContent);
         console.log('🔍 Parsed JSON successfully');
-        console.log('🔍 Thai text:', parsed.thai_text);
+        console.log('🔍 English text:', parsed.english_text);
         
-        // Validate that we have actual Thai text
-        if (!parsed.thai_text || parsed.thai_text.trim() === '' || parsed.thai_text.includes('```')) {
-          throw new Error('Invalid Thai text in response');
+        // Validate that we have actual English text
+        if (!parsed.english_text || parsed.english_text.trim() === '' || parsed.english_text.includes('```')) {
+          throw new Error('Invalid English text in response');
         }
         
-        // Add pinyin if missing
+        // Add romaji pronunciation if missing
         if (parsed.word_breakdown && Array.isArray(parsed.word_breakdown)) {
           parsed.word_breakdown.forEach(word => {
             if (!word.pinyin || word.pinyin.trim() === '') {
-              // Simple pinyin fallback based on common Thai words
-              const pinyinMap = {
-                'ฉัน': 'chan',
-                'ชอบ': 'chop', 
-                'กิน': 'gin',
-                'ข้าว': 'khao',
-                'ผัด': 'phat',
-                'วันนี้': 'wan ni',
-                'กับ': 'kap',
-                'ปลา': 'pla',
-                'น้ำ': 'nam',
-                'ดี': 'di',
-                'มาก': 'mak',
-                'สวัสดี': 'sawat di',
-                'ครับ': 'khrap',
-                'ค่ะ': 'kha'
+              // Simple romaji fallback based on common English words
+              const romajiMap = {
+                'I': 'ai',
+                'like': 'raiku',
+                'to': 'tuu',
+                'eat': 'iito',
+                'pizza': 'piza',
+                'hello': 'harou',
+                'thank you': 'sankyuu',
+                'yes': 'iesu',
+                'no': 'nou'
               };
-              word.pinyin = pinyinMap[word.word] || word.word.toLowerCase();
+              word.pinyin = romajiMap[word.word.toLowerCase()] || word.word.toLowerCase();
             }
           });
         }
@@ -155,7 +151,7 @@ class DeepSeekService {
         const delay = baseDelay * Math.pow(2, retryCount); // Exponential backoff
         console.log(`🔄 Retrying in ${delay}ms...`);
         await new Promise(resolve => setTimeout(resolve, delay));
-        return this.generateThaiSentence(difficultyLevel, retryCount + 1);
+        return this.generateEnglishSentence(difficultyLevel, retryCount + 1);
       }
       
       console.error('❌ All DeepSeek attempts failed');

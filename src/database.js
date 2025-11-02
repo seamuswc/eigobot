@@ -44,8 +44,8 @@ class Database {
       )`,
       `CREATE TABLE IF NOT EXISTS sentences (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        thai_text TEXT NOT NULL,
-        english_translation TEXT,
+        english_text TEXT NOT NULL,
+        japanese_translation TEXT,
         difficulty_level INTEGER,
         word_breakdown TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP

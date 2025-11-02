@@ -13,7 +13,6 @@ module.exports = {
   
   // TON Configuration
   TON_ADDRESS: process.env.TON_ADDRESS || 'UQBDTEPa2TsufNyTFvpydJH07AlOt48cB7Nyq6rFZ7p6e-wt',
-  TON_AMOUNT: parseFloat(process.env.TON_AMOUNT) || 1.0,
   SUBSCRIPTION_DAYS: parseInt(process.env.SUBSCRIPTION_DAYS) || 30,
   
   // TON Native USDT Configuration (Jetton)
@@ -28,19 +27,19 @@ module.exports = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   
   // Timezone
-  TIMEZONE: process.env.TIMEZONE || 'Asia/Bangkok',
+  TIMEZONE: process.env.TIMEZONE || 'Asia/Tokyo',
   
-  // Difficulty levels
+  // Difficulty levels (for Japanese speakers learning English)
   DIFFICULTY_LEVELS: {
-    1: { name: 'Beginner', description: 'very simple, 1-3 words' },
-    2: { name: 'Elementary', description: 'simple sentences, 4-6 words' },
-    3: { name: 'Intermediate', description: 'moderate complexity, 7-10 words' },
-    4: { name: 'Advanced', description: 'complex sentences, 11-15 words' },
-    5: { name: 'Expert', description: 'very complex, 16+ words' }
+    1: { name: 'Very Basic', description: 'simple sentences' },
+    2: { name: 'Basic', description: 'present tense' },
+    3: { name: 'Intermediate', description: 'past/future tense' },
+    4: { name: 'Advanced', description: 'complex sentences' },
+    5: { name: 'Advanced', description: 'idioms, phrasal verbs' }
   },
   
-  // Daily message schedule (9:00 AM ICT)
-  DAILY_MESSAGE_CRON: '0 9 * * *', // 9:00 AM ICT (Bangkok time)
+  // Daily message schedule (9:00 AM JST)
+  DAILY_MESSAGE_CRON: '0 9 * * *', // 9:00 AM JST (Japan time)
   
   // Grading thresholds
   GRADING: {

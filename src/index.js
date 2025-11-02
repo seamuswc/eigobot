@@ -6,7 +6,7 @@ const Scheduler = require('./scheduler');
 const messageQueue = require('./messageQueue');
 const config = require('./config');
 
-class ThaiLearningBot {
+class EnglishLearningBot {
   constructor() {
     this.app = express();
     this.telegramBot = new TelegramBotHandler();
@@ -63,7 +63,7 @@ class ThaiLearningBot {
     this.app.listen(config.PORT, () => {
       console.log(`🚀 Server running on port ${config.PORT}`);
       console.log(`🌍 Timezone: ${config.TIMEZONE}`);
-      console.log(`📅 Daily messages scheduled for 9:00 AM ICT`);
+      console.log(`📅 Daily messages scheduled for 9:00 AM JST`);
     });
   }
 
@@ -140,15 +140,15 @@ class ThaiLearningBot {
 }
 
 // Start the bot
-const bot = new ThaiLearningBot();
+const bot = new EnglishLearningBot();
 
 // Graceful shutdown
 process.on('SIGINT', () => {
-  console.log('\n🛑 Shutting down Thai Learning Bot...');
+  console.log('\n🛑 Shutting down English Learning Bot...');
   process.exit(0);
 });
 
 process.on('SIGTERM', () => {
-  console.log('\n🛑 Shutting down Thai Learning Bot...');
+  console.log('\n🛑 Shutting down English Learning Bot...');
   process.exit(0);
 });

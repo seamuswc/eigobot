@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Server Wipe Script - Use with caution!
-# This completely removes the Thai Learning Bot from the server
+# This completely removes the English Learning Bot from the server
 
 SERVER_IP=${1:-"68.183.185.81"}
-SERVICE_NAME="thai-learning-bot"
-APP_DIR="/opt/thai-learning-bot"
+SERVICE_NAME="english-learning-bot"
+APP_DIR="/opt/english-learning-bot"
 
-echo "🧹 WIPING SERVER - Thai Learning Bot will be completely removed!"
+echo "🧹 WIPING SERVER - English Learning Bot (EigoBot) will be completely removed!"
 echo "⚠️  This action cannot be undone!"
 echo ""
 

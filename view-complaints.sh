@@ -3,7 +3,7 @@
 # View Contact Form Complaints/Logs
 # Usage: ./view-complaints.sh [number_of_lines]
 
-LOG_FILE="/opt/thai-learning-bot/logs/contact-form.log"
+LOG_FILE="/opt/english-learning-bot/logs/contact-form.log"
 LINES=${1:-50}
 
 echo "📝 Contact Form Complaints/Logs"

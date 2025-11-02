@@ -11,7 +11,7 @@ class Scheduler {
   }
 
   setupDailyMessages() {
-    // Schedule daily messages at 9:00 AM ICT (2:00 AM UTC)
+    // Schedule daily messages at 9:00 AM JST
     cron.schedule(config.DAILY_MESSAGE_CRON, async () => {
       console.log('📅 Daily message scheduler triggered');
       await this.sendDailyMessages();
@@ -19,7 +19,7 @@ class Scheduler {
       timezone: config.TIMEZONE
     });
 
-    console.log('⏰ Daily message scheduler set for 9:00 AM ICT');
+    console.log('⏰ Daily message scheduler set for 9:00 AM JST');
   }
 
   async sendDailyMessages() {
@@ -33,7 +33,7 @@ class Scheduler {
       const difficultySentences = {};
       for (let level = 1; level <= 5; level++) {
         try {
-          difficultySentences[level] = await deepseekService.generateThaiSentence(level);
+          difficultySentences[level] = await deepseekService.generateEnglishSentence(level);
           console.log(`✅ Generated sentence for difficulty ${level}`);
         } catch (error) {
           console.error(`❌ Error generating sentence for difficulty ${level}:`, error);
@@ -94,42 +94,42 @@ class Scheduler {
     // Create word breakdown
     let wordBreakdown = '';
     if (sentenceData.word_breakdown && sentenceData.word_breakdown.length > 0) {
-      wordBreakdown = '\n\n📚 Word Breakdown:\n';
+      wordBreakdown = '\n\n📚 単語の解説:\n';
       for (const word of sentenceData.word_breakdown) {
         if (typeof word === 'object' && word.word && word.meaning) {
-          const pinyin = word.pinyin || '';
-          wordBreakdown += `${word.word} - ${word.meaning} - ${pinyin}\n`;
+          const romaji = word.pinyin || '';
+          wordBreakdown += `${word.word} - ${word.meaning} - ${romaji}\n`;
         } else if (typeof word === 'string') {
           wordBreakdown += `${word}\n`;
         }
       }
     }
 
-    return `🇹🇭 Daily Thai Lesson
+    return `🇬🇧 今日の英語レッスン
 
-📝 Thai Sentence:
-${sentenceData.thai_text}
+📝 英語の文章:
+${sentenceData.english_text}
 
-🔤 English Translation:
-${sentenceData.english_translation}
+🔤 日本語訳:
+${sentenceData.japanese_translation}
 
-Try typing the sentence back in Thai!${wordBreakdown}
+英語の文章をタイプしてみましょう！${wordBreakdown}
 
-Practice writing the Thai sentence!`;
+英語の文章を練習しましょう！`;
   }
 
   async saveSentence(sentenceData, difficultyLevel) {
     return new Promise((resolve, reject) => {
       const query = `
-        INSERT INTO sentences (thai_text, english_translation, difficulty_level, word_breakdown)
+        INSERT INTO sentences (english_text, japanese_translation, difficulty_level, word_breakdown)
         VALUES (?, ?, ?, ?)
       `;
       
       const wordBreakdown = JSON.stringify(sentenceData.word_breakdown || []);
       
       database.db.run(query, [
-        sentenceData.thai_text,
-        sentenceData.english_translation,
+        sentenceData.english_text,
+        sentenceData.japanese_translation,
         difficultyLevel,
         wordBreakdown
       ], function(err) {
