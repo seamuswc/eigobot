@@ -67,7 +67,7 @@ ssh root@$SERVER_IP << EOF
     echo "⚠️  No local .env file found. Creating from template..."
     cat > .env << 'EOL'
 # Telegram Bot Configuration
-TELEGRAM_BOT_TOKEN=8398725072:AAGGQTvGOx5EueDNTPQ8DU5BTYkH08Y90Zc
+TELEGRAM_BOT_TOKEN=your-telegram-bot-token
 
 # DeepSeek API
 DEEPSEEK_API_KEY=your-deepseek-api-key
