@@ -177,7 +177,7 @@ curl http://68.183.185.81:3000/health
 npm run dev
 
 # Check logs
-pm2 logs thai-learning-bot --lines 50
+pm2 logs english-learning-bot --lines 50
 ```
 
 ## 📝 Logs

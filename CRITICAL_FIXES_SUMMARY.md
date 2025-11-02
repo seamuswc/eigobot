@@ -1,4 +1,4 @@
-# 🎯 Thai Learning Bot - Critical Fixes Summary
+# 🎯 English Learning Bot (EigoBot) - Critical Fixes Summary
 
 ## ✅ **ALL CRITICAL BUGS FIXED**
 
@@ -33,7 +33,7 @@ const user = await database.getUser(userId.toString());
 ```javascript
 // NEW TON payment implementation:
 const tonAmount = Math.floor(config.TON_AMOUNT * 1000000000); // Convert to nanoTON
-const paymentReference = `thai-bot-${userId}-${Date.now()}`;
+const paymentReference = `english-bot-${userId}-${Date.now()}`;
 const tonUrl = `ton://${config.TON_ADDRESS}/transfer?amount=${tonAmount}&text=${encodeURIComponent(paymentReference)}`;
 ```
 
@@ -75,7 +75,7 @@ const tonUrl = `ton://${config.TON_ADDRESS}/transfer?amount=${tonAmount}&text=${
 - ✅ `src/database.js` - Database operations with fresh data fetching
 - ✅ `src/config.js` - Configuration management
 - ✅ `src/services/deepseek.js` - AI sentence generation
-- ✅ `src/services/thaiProcessor.js` - Thai text processing
+- ✅ `src/services/deepseek.js` - English sentence generation for Japanese speakers
 - ✅ `src/scheduler.js` - Daily message scheduler
 - ✅ `src/index.js` - Express server
 - ✅ `deploy.sh` - Deployment script
@@ -145,7 +145,7 @@ curl http://68.183.185.81:3000/health
 
 **ALL CRITICAL BUGS FIXED AND TESTED** ✅
 
-The Thai Learning Telegram Bot is now ready for deployment with:
+The English Learning Telegram Bot (EigoBot) is now ready for deployment with:
 - ✅ Working difficulty level persistence
 - ✅ Working TON payment integration  
 - ✅ Fresh database data fetching

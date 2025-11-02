@@ -3,7 +3,7 @@
 # English Learning Bot (EigoBot) Deployment Script
 # Usage: ./deploy.sh [server_ip]
 
-SERVER_IP=${1:-"68.183.185.81"}
+SERVER_IP=${1:-"152.42.166.129"}
 APP_DIR="/opt/english-learning-bot"
 SERVICE_NAME="english-learning-bot"
 
@@ -11,7 +11,7 @@ echo "🚀 Deploying English Learning Bot (EigoBot) to $SERVER_IP"
 
 # Create deployment package
 echo "📦 Creating deployment package..."
-  tar -czf english-learning-bot.tar.gz \
+tar -czf english-learning-bot.tar.gz \
   --exclude=node_modules \
   --exclude=.git \
   --exclude=data \
@@ -33,18 +33,30 @@ ssh root@$SERVER_IP << EOF
   # Extract files
   tar -xzf /tmp/english-learning-bot.tar.gz
   
+  # Install Node.js if not installed
+  if ! command -v node &> /dev/null; then
+    echo "📦 Installing Node.js..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt-get install -y nodejs
+  fi
+  
+  # Install nginx and certbot if not installed
+  if ! command -v nginx &> /dev/null; then
+    echo "🌐 Installing nginx and certbot..."
+    apt-get update
+    apt-get install -y nginx certbot python3-certbot-nginx
+    systemctl enable nginx
+  fi
+  
   # Install dependencies
   npm install --production
   
   # Create data directory
   mkdir -p data
   
-  # Set up environment - copy from local .env if it exists
-  if [ -f .env ]; then
-    echo "📋 Copying local .env file..."
-    cp .env .env.backup
-  else
-    echo "⚠️  No local .env file found. Creating from template..."
+  # Set up environment - preserve existing .env if it exists
+  if [ ! -f .env ]; then
+    echo "⚠️  No .env file found. Creating from template..."
     cat > .env << 'EOL'
 # Telegram Bot Configuration
 TELEGRAM_BOT_TOKEN=your-telegram-bot-token
@@ -53,11 +65,15 @@ TELEGRAM_BOT_TOKEN=your-telegram-bot-token
 DEEPSEEK_API_KEY=your-deepseek-api-key
 
 # TON Configuration
-TON_ADDRESS=your-ton-address
+TON_ADDRESS=UQBDTEPa2TsufNyTFvpydJH07AlOt48cB7Nyq6rFZ7p6e-wt
 SUBSCRIPTION_DAYS=30
 
 # TON Console API Key
 TON_API_KEY=your-ton-console-api-key
+
+# USDT Configuration
+USDT_CONTRACT_ADDRESS=your-usdt-contract-address
+USDT_AMOUNT=1
 
 # Webhook Configuration
 WEBHOOK_BASE_URL=https://eigobot.com
@@ -72,7 +88,9 @@ NODE_ENV=production
 # Timezone
 TIMEZONE=Asia/Tokyo
 EOL
-    echo "⚠️  Please update .env file with your actual API keys!"
+    echo "⚠️  Please update .env file with your actual API keys on the server!"
+  else
+    echo "✅ Preserving existing .env file"
   fi
   
   # Create systemd service
@@ -122,6 +140,75 @@ EOL
     systemctl restart $SERVICE_NAME
   else
     echo "✅ Single bot instance confirmed"
+  fi
+  
+  # Configure nginx reverse proxy if not already configured
+  if [ ! -f /etc/nginx/sites-enabled/eigobot ]; then
+    echo "🌐 Configuring nginx reverse proxy..."
+    
+    # Check if SSL certificate exists
+    SSL_EXISTS=false
+    if [ -f /etc/letsencrypt/live/eigobot.com/fullchain.pem ]; then
+      SSL_EXISTS=true
+      echo "🔒 SSL certificate detected..."
+    fi
+    
+    # Only write HTTP config if SSL is not configured
+    if [ "$SSL_EXISTS" = false ]; then
+      # Create HTTP-only config (for initial SSL setup)
+      cat > /etc/nginx/sites-available/eigobot << NGINX_EOF
+server {
+    listen 80;
+    server_name eigobot.com www.eigobot.com;
+    
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+    }
+}
+NGINX_EOF
+      
+      # Enable site
+      ln -sf /etc/nginx/sites-available/eigobot /etc/nginx/sites-enabled/
+      rm -f /etc/nginx/sites-enabled/default
+      
+      # Test nginx configuration
+      nginx -t
+      
+      # Enable and start nginx
+      systemctl enable nginx
+      systemctl restart nginx
+      
+      # Wait for nginx to be fully ready
+      sleep 2
+      
+      # Install SSL certificate with Let's Encrypt
+      echo "🔒 Setting up SSL certificate..."
+      certbot --nginx -d eigobot.com -d www.eigobot.com --non-interactive --agree-tos --email admin@eigobot.com --redirect || {
+        echo "⚠️ SSL certificate installation failed. You can run it manually later with:"
+        echo "   certbot --nginx -d eigobot.com -d www.eigobot.com"
+      }
+    else
+      # SSL exists but config doesn't - let certbot configure it
+      echo "🔒 SSL certificate exists - configuring nginx with certbot..."
+      certbot --nginx -d eigobot.com -d www.eigobot.com --non-interactive --agree-tos --redirect || true
+    fi
+  else
+    echo "✅ Nginx configuration already exists"
+    # Verify nginx config is valid
+    if nginx -t; then
+      systemctl reload nginx || systemctl restart nginx
+      echo "✅ Nginx reloaded"
+    else
+      echo "⚠️ Nginx config has errors. Run manually: nginx -t"
+    fi
   fi
   
   echo "✅ Deployment completed!"

@@ -1,7 +1,7 @@
 {
-  "name": "thai-learning-bot",
+  "name": "english-learning-bot",
   "version": "1.0.0",
-  "description": "Thai Language Learning Telegram Bot with TON payments",
+  "description": "English Language Learning Telegram Bot for Japanese Speakers with TON payments",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -23,11 +23,13 @@
   "keywords": [
     "telegram",
     "bot",
-    "thai",
+    "english",
+    "japanese",
     "learning",
     "ton",
-    "cryptocurrency"
+    "cryptocurrency",
+    "eigobot"
   ],
-  "author": "Thai Learning Bot",
+  "author": "EigoBot",
   "license": "MIT"
 }
