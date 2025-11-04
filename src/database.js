@@ -197,6 +197,32 @@ class Database {
     });
   }
 
+  // Get recent sentences for a difficulty level to avoid duplicates
+  async getRecentSentences(difficultyLevel, days = 30) {
+    return new Promise((resolve, reject) => {
+      // Calculate the date in JavaScript for SQLite compatibility
+      const dateLimit = new Date();
+      dateLimit.setDate(dateLimit.getDate() - days);
+      const dateLimitStr = dateLimit.toISOString();
+      
+      const query = `
+        SELECT english_text, japanese_translation 
+        FROM sentences 
+        WHERE difficulty_level = ? 
+        AND created_at >= ?
+        ORDER BY created_at DESC
+      `;
+      this.db.all(query, [difficultyLevel, dateLimitStr], (err, rows) => {
+        if (err) {
+          console.error('❌ Database getRecentSentences error:', err.message);
+          reject(err);
+        } else {
+          resolve(rows || []);
+        }
+      });
+    });
+  }
+
   async saveUserProgress(telegramUserId, sentenceId, userResponse, grade, isCorrect) {
     return new Promise((resolve, reject) => {
       const query = `

@@ -3,24 +3,33 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Learn English for Japanese Speakers | Daily English Lessons via Telegram Bot</title>
-  <meta name="description" content="Learn English online with daily English lessons delivered to your Telegram at 9am Japan time. English lessons for Japanese speakers with Japanese translations, word-by-word breakdowns, pronunciation guides, and 5 difficulty levels. Start learning English today!">
-  <meta name="keywords" content="learn English, learn English language, learn English online, English lessons, English language learning, how to learn English, English for Japanese, 英語学習, 日本人向け英語, English vocabulary, English grammar, English pronunciation, English language bot, Telegram English lessons">
+  <title>英語学習 Telegramボット | 毎日の英語レッスン | TON決済対応 | EigoBot</title>
+  <meta name="description" content="毎日9時（日本時間）にTelegramで配信される英語レッスン。日本人向けの英語学習ボット。日本語訳、単語解説、発音ガイド付き。5つの難易度レベル。TON・USDT決済対応。英語レッスン、Telegramボット、TON決済で検索。">
+  <meta name="keywords" content="英語学習, 英語レッスン, Telegramボット, TON決済, USDT決済, 日本人向け英語, 毎日英語, 英語学習ボット, 英語文法, 英語発音, 英語語彙, 英語学習アプリ, learn English, English lessons, Telegram bot, TON payment, USDT payment, English for Japanese, daily English lessons, English learning bot">
   <meta name="author" content="EigoBot">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#007bff">
   <link rel="canonical" href="https://eigobot.com">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://eigobot.com">
-  <meta property="og:title" content="Learn English for Japanese Speakers | Daily English Lessons via Telegram">
-  <meta property="og:description" content="Learn English online with daily English lessons. English lessons for Japanese speakers with Japanese translations, word breakdowns, and pronunciation guides. 5 difficulty levels. Start learning English today!">
+  <meta property="og:title" content="英語学習 Telegramボット | 毎日の英語レッスン | TON決済 | EigoBot">
+  <meta property="og:description" content="毎日9時にTelegramで配信される英語レッスン。日本人向け。日本語訳、単語解説、発音ガイド付き。5つの難易度レベル。TON・USDT決済対応。Daily English lessons for Japanese speakers via Telegram bot with TON payment.">
   <meta property="og:site_name" content="EigoBot">
+  <meta property="og:image" content="https://eigobot.com/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="EigoBot - English Learning Bot for Japanese Speakers">
+  <meta property="og:locale" content="ja_JP">
   
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://eigobot.com">
-  <meta name="twitter:title" content="Learn English for Japanese Speakers | Daily English Lessons">
-  <meta name="twitter:description" content="Learn English online with daily English lessons. English lessons for Japanese speakers with translations, word breakdowns, and pronunciation. 5 difficulty levels.">
+  <meta name="twitter:title" content="英語学習 Telegramボット | 毎日の英語レッスン | TON決済 | EigoBot">
+  <meta name="twitter:description" content="毎日9時にTelegramで配信される英語レッスン。日本人向け。日本語訳、単語解説、発音ガイド付き。5つの難易度レベル。TON・USDT決済対応。">
+  <meta name="twitter:image" content="https://eigobot.com/og-image.jpg">
+  <meta name="twitter:image:alt" content="EigoBot - English Learning Bot for Japanese Speakers">
   
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-F0R0N42NG4"></script>
@@ -37,19 +46,36 @@
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "EigoBot",
-    "description": "Daily English Lessons delivered via Telegram at 9am Japan time. Learn English for Japanese speakers with clear Japanese translations, word-by-word breakdowns, and pronunciation guides.",
+    "alternateName": "英語ボット",
+    "description": "毎日9時（日本時間）にTelegramで配信される英語レッスン。日本人向けの英語学習ボット。日本語訳、単語解説、発音ガイド付き。5つの難易度レベル。TON・USDT決済対応。Daily English Lessons delivered via Telegram at 9am Japan time for Japanese speakers with clear translations, word breakdowns, and pronunciation guides.",
     "url": "https://eigobot.com",
     "applicationCategory": "EducationalApplication",
     "operatingSystem": "Telegram",
     "offers": {
       "@type": "Offer",
       "price": "1.0",
-      "priceCurrency": "TON"
+      "priceCurrency": "USD",
+      "priceSpecification": {
+        "@type": "UnitPriceSpecification",
+        "price": "1.0",
+        "priceCurrency": "USD"
+      },
+      "alternateName": "TON payment also available"
     },
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "5",
       "ratingCount": "1"
+    },
+    "screenshot": "https://eigobot.com/og-image.jpg",
+    "inLanguage": ["en", "ja"],
+    "audience": {
+      "@type": "Audience",
+      "audienceType": "Japanese speakers learning English",
+      "geographicArea": {
+        "@type": "Country",
+        "name": "Japan"
+      }
     }
   }
   </script>
@@ -177,7 +203,7 @@
     </main>
   </div>
   <script>
-    document.getElementById('y').textContent = new Date().getFullYear();
+    // Fix for footer year if needed
     
     // Contact form handler
     document.getElementById('contact-form').addEventListener('submit', async function(e) {
