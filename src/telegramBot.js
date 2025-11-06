@@ -36,6 +36,13 @@ class TelegramBotHandler {
     }
   }
 
+  // Sanitize pronunciation to only use Latin alphabet (a-z, A-Z, spaces, hyphens, apostrophes)
+  sanitizePronunciation(text) {
+    if (!text) return '';
+    // Only allow: a-z, A-Z, spaces, hyphens, apostrophes
+    return text.toString().replace(/[^a-zA-Z\s\-']/g, '').trim();
+  }
+
   /**
    * Helper function to create inline keyboard
    * @param {Array<Array<Object>>} buttons - Array of button rows
@@ -786,7 +793,7 @@ ${priceMessage}
         wordBreakdown = '\n\n📚 単語の解説:\n';
         for (const word of sentenceData.word_breakdown) {
           if (typeof word === 'object' && word.word && word.meaning) {
-            const romaji = word.pinyin || '';
+            const romaji = this.sanitizePronunciation(word.pinyin || '');
             wordBreakdown += `${word.word} - ${word.meaning} - ${romaji}\n`;
           } else if (typeof word === 'string') {
             wordBreakdown += `${word}\n`;

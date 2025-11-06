@@ -10,6 +10,13 @@ class DeepSeekService {
     this.lastCacheDate = null; // Track when cache was last updated
   }
 
+  // Sanitize pronunciation to only use Latin alphabet (a-z, A-Z, spaces, hyphens, apostrophes)
+  sanitizePronunciation(text) {
+    if (!text) return '';
+    // Only allow: a-z, A-Z, spaces, hyphens, apostrophes
+    return text.toString().replace(/[^a-zA-Z\s\-']/g, '').trim();
+  }
+
   // Check if cache needs to be reset (8:00 AM JST)
   shouldResetCache() {
     const now = new Date();
@@ -66,11 +73,17 @@ class DeepSeekService {
       - meaning: Japanese meaning (日本語の意味)
       - pinyin: English pronunciation in romaji (ローマ字表記)
       
+      CRITICAL FOR PRONUNCIATION (pinyin field):
+      - ONLY use Latin alphabet characters: a-z, A-Z
+      - You may use spaces, hyphens (-), and apostrophes (')
+      - DO NOT use Greek letters, Cyrillic, or any other non-Latin characters
+      - Examples: "harou", "raiku", "piza", "ai", "iito", "tudei"
+      
       IMPORTANT: Break down into individual words. For example:
       - "I like to eat pizza." should be broken down as:
-        - "I" (私 - watashi)
-        - "like" (好き - suki)
-        - "to eat" (食べる - taberu)
+        - "I" (私 - ai)
+        - "like" (好き - raiku)
+        - "to eat" (食べる - tu iito)
         - "pizza" (ピザ - piza)
       
       CRITICAL REQUIREMENTS:
@@ -139,9 +152,18 @@ class DeepSeekService {
           }
         }
         
-        // Add romaji pronunciation if missing
+        // Sanitize and add romaji pronunciation if missing
         if (parsed.word_breakdown && Array.isArray(parsed.word_breakdown)) {
           parsed.word_breakdown.forEach(word => {
+            if (word.pinyin) {
+              // Sanitize existing pronunciation to remove non-Latin characters
+              const sanitized = this.sanitizePronunciation(word.pinyin);
+              if (sanitized !== word.pinyin) {
+                console.log(`🔧 Sanitized pronunciation: "${word.pinyin}" → "${sanitized}"`);
+              }
+              word.pinyin = sanitized;
+            }
+            
             if (!word.pinyin || word.pinyin.trim() === '') {
               // Simple romaji fallback based on common English words
               const romajiMap = {
