@@ -10,11 +10,11 @@ class DeepSeekService {
     this.lastCacheDate = null; // Track when cache was last updated
   }
 
-  // Sanitize pronunciation to only use Latin alphabet (a-z, A-Z, spaces, hyphens, apostrophes)
+  // Sanitize pronunciation to only use katakana (カタカナ)
   sanitizePronunciation(text) {
     if (!text) return '';
-    // Only allow: a-z, A-Z, spaces, hyphens, apostrophes
-    return text.toString().replace(/[^a-zA-Z\s\-']/g, '').trim();
+    // Only allow: katakana characters (\u30A0-\u30FF), spaces, hyphens, long vowel mark (ー)
+    return text.toString().replace(/[^\u30A0-\u30FF\s\-ー]/g, '').trim();
   }
 
   // Check if cache needs to be reset (8:00 AM JST)
@@ -71,20 +71,20 @@ class DeepSeekService {
       For word_breakdown, provide an array of objects with:
       - word: the individual English word
       - meaning: Japanese meaning (日本語の意味)
-      - pinyin: English pronunciation in romaji (ローマ字表記)
+      - pinyin: English pronunciation in katakana (カタカナ表記)
       
       CRITICAL FOR PRONUNCIATION (pinyin field):
-      - ONLY use Latin alphabet characters: a-z, A-Z
-      - You may use spaces, hyphens (-), and apostrophes (')
-      - DO NOT use Greek letters, Cyrillic, or any other non-Latin characters
-      - Examples: "harou", "raiku", "piza", "ai", "iito", "tudei"
+      - ONLY use katakana characters (カタカナ)
+      - You may use spaces, hyphens (-), and long vowel mark (ー)
+      - DO NOT use hiragana, romaji, or any other characters
+      - Examples: "ハロー", "ライク", "ピザ", "アイ", "イート", "トゥデイ"
       
       IMPORTANT: Break down into individual words. For example:
       - "I like to eat pizza." should be broken down as:
-        - "I" (私 - ai)
-        - "like" (好き - raiku)
-        - "to eat" (食べる - tu iito)
-        - "pizza" (ピザ - piza)
+        - "I" (私 - アイ)
+        - "like" (好き - ライク)
+        - "to eat" (食べる - トゥ イート)
+        - "pizza" (ピザ - ピザ)
       
       CRITICAL REQUIREMENTS:
       - Use a completely different topic, vocabulary, and sentence structure
@@ -152,11 +152,11 @@ class DeepSeekService {
           }
         }
         
-        // Sanitize and add romaji pronunciation if missing
+        // Sanitize and add katakana pronunciation if missing
         if (parsed.word_breakdown && Array.isArray(parsed.word_breakdown)) {
           parsed.word_breakdown.forEach(word => {
             if (word.pinyin) {
-              // Sanitize existing pronunciation to remove non-Latin characters
+              // Sanitize existing pronunciation to remove non-katakana characters
               const sanitized = this.sanitizePronunciation(word.pinyin);
               if (sanitized !== word.pinyin) {
                 console.log(`🔧 Sanitized pronunciation: "${word.pinyin}" → "${sanitized}"`);
@@ -165,19 +165,19 @@ class DeepSeekService {
             }
             
             if (!word.pinyin || word.pinyin.trim() === '') {
-              // Simple romaji fallback based on common English words
-              const romajiMap = {
-                'I': 'ai',
-                'like': 'raiku',
-                'to': 'tuu',
-                'eat': 'iito',
-                'pizza': 'piza',
-                'hello': 'harou',
-                'thank you': 'sankyuu',
-                'yes': 'iesu',
-                'no': 'nou'
+              // Simple katakana fallback based on common English words
+              const katakanaMap = {
+                'I': 'アイ',
+                'like': 'ライク',
+                'to': 'トゥ',
+                'eat': 'イート',
+                'pizza': 'ピザ',
+                'hello': 'ハロー',
+                'thank you': 'サンキュー',
+                'yes': 'イエス',
+                'no': 'ノー'
               };
-              word.pinyin = romajiMap[word.word.toLowerCase()] || word.word.toLowerCase();
+              word.pinyin = katakanaMap[word.word.toLowerCase()] || '';
             }
           });
         }

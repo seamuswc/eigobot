@@ -215,6 +215,6 @@ Database: Updated 1 rows for user 1302731344 to level 3
 
 - **English Lessons**: Daily English sentences for Japanese speakers
 - **Japanese Translations**: Clear Japanese translations (日本語訳)
-- **Word Breakdowns**: English word → Japanese meaning → pronunciation (romaji)
+- **Word Breakdowns**: English word → Japanese meaning → pronunciation (katakana)
 - **Japanese UI**: All bot messages are in Japanese (polite form: です/ます)
 - **English Content**: Lesson content remains in English for learning

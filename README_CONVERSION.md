@@ -28,15 +28,15 @@ CHANGES NEEDED:
 4. EXAMPLE LESSON FORMAT:
    - The bot should send English sentences
    - Provide Japanese translations (日本語訳)
-   - Word-by-word breakdowns: English word → Japanese meaning → pronunciation (romaji)
+   - Word-by-word breakdowns: English word → Japanese meaning → pronunciation (katakana)
    - Example:
      English: "I like to eat pizza."
      Japanese: 私はピザを食べるのが好きです。
      Breakdown:
-     I - 私 - watashi
-     like - 好き - suki
-     to eat - 食べる - taberu
-     pizza - ピザ - piza
+     I - 私 - アイ
+     like - 好き - ライク
+     to eat - 食べる - トゥ イート
+     pizza - ピザ - ピザ
 
 5. SEO & METADATA:
    - Update public/index.html title: "Learn English for Japanese Speakers | Daily English Lessons"

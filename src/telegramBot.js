@@ -36,11 +36,11 @@ class TelegramBotHandler {
     }
   }
 
-  // Sanitize pronunciation to only use Latin alphabet (a-z, A-Z, spaces, hyphens, apostrophes)
+  // Sanitize pronunciation to only use katakana (カタカナ)
   sanitizePronunciation(text) {
     if (!text) return '';
-    // Only allow: a-z, A-Z, spaces, hyphens, apostrophes
-    return text.toString().replace(/[^a-zA-Z\s\-']/g, '').trim();
+    // Only allow: katakana characters (\u30A0-\u30FF), spaces, hyphens, long vowel mark (ー)
+    return text.toString().replace(/[^\u30A0-\u30FF\s\-ー]/g, '').trim();
   }
 
   /**
@@ -793,8 +793,8 @@ ${priceMessage}
         wordBreakdown = '\n\n📚 単語の解説:\n';
         for (const word of sentenceData.word_breakdown) {
           if (typeof word === 'object' && word.word && word.meaning) {
-            const romaji = this.sanitizePronunciation(word.pinyin || '');
-            wordBreakdown += `${word.word} - ${word.meaning} - ${romaji}\n`;
+            const katakana = this.sanitizePronunciation(word.pinyin || '');
+            wordBreakdown += `${word.word} - ${word.meaning} - ${katakana}\n`;
           } else if (typeof word === 'string') {
             wordBreakdown += `${word}\n`;
           }
