@@ -328,20 +328,24 @@ class TelegramBotHandler {
       // Format price message with $1 USD equivalent
       const priceMessage = await priceService.formatPriceMessage(tonAmountForUSD, config.USDT_AMOUNT);
       
-      // Create Telegram Wallet mini app deep link
-      // Format: https://t.me/wallet?start=pay&address=<ADDRESS>&amount=<TON>&comment=<COMMENT>
-      // Note: amount is in TON (not nanoTON)
-      const telegramWalletLink = `https://t.me/wallet?start=pay&address=${config.TON_ADDRESS}&amount=${tonAmountForUSD.toFixed(4)}&comment=${encodeURIComponent(paymentReference)}`;
-      console.log(`🔗 Telegram Wallet Link: ${telegramWalletLink}`);
+      // Create Telegram Wallet Mini App link with TON Connect
+      // This opens a web app that uses TON Connect to connect to Telegram Wallet
+      const paymentAppUrl = `https://eigobot.com/pay.html?address=${config.TON_ADDRESS}&amount=${tonAmountNano}&ton=${tonAmountForUSD.toFixed(4)}&ref=${encodeURIComponent(paymentReference)}&user=${userId}`;
+      console.log(`🔗 Payment App URL: ${paymentAppUrl}`);
       
       // Create payment buttons
-      const keyboard = this.createKeyboard([
-        [{ text: `📱 Telegram Wallet (${tonAmountForUSD.toFixed(4)} TON)`, url: telegramWalletLink }],
-        [{ text: `💎 ${tonAmountForUSD.toFixed(4)} TONを支払う（Tonkeeper）`, url: tonDeepLink }],
-        [{ text: '💵 1 USDTを支払う（Tonkeeper）', url: tonUsdtDeepLink }],
-        [{ text: '✅ 支払い済み', callback_data: `check_payment_${userId}` }],
-        [{ text: '🏠 メインメニュー', callback_data: 'back_to_main' }]
-      ]);
+      // Note: web_app button opens the Mini App inside Telegram
+      const keyboard = {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: `📱 Telegram Wallet (${tonAmountForUSD.toFixed(4)} TON)`, web_app: { url: paymentAppUrl } }],
+            [{ text: `💎 ${tonAmountForUSD.toFixed(4)} TONを支払う（Tonkeeper）`, url: tonDeepLink }],
+            [{ text: '💵 1 USDTを支払う（Tonkeeper）', url: tonUsdtDeepLink }],
+            [{ text: '✅ 支払い済み', callback_data: `check_payment_${userId}` }],
+            [{ text: '🏠 メインメニュー', callback_data: 'back_to_main' }]
+          ]
+        }
+      };
       
       const message = `💎 英語学習ボットを購読する
 

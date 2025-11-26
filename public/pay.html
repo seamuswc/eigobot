@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>EigoBot - 支払い</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@2.0.9/dist/tonconnect-ui.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --secondary-text: #707579;
+      --button-color: #3390ec;
+      --button-text: #ffffff;
+      --card-bg: #f4f4f5;
+      --success-color: #31b545;
+      --error-color: #e53935;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    body.dark {
+      --bg-color: #212121;
+      --text-color: #ffffff;
+      --secondary-text: #aaaaaa;
+      --card-bg: #2c2c2c;
+    }
+    
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    
+    .header .icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    
+    .header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .header p {
+      color: var(--secondary-text);
+      font-size: 14px;
+    }
+    
+    .payment-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .payment-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(128,128,128,0.2);
+    }
+    
+    .payment-row:last-child {
+      border-bottom: none;
+    }
+    
+    .payment-label {
+      color: var(--secondary-text);
+      font-size: 14px;
+    }
+    
+    .payment-value {
+      font-weight: 600;
+      font-size: 16px;
+    }
+    
+    .payment-value.amount {
+      color: var(--button-color);
+      font-size: 20px;
+    }
+    
+    #ton-connect-button {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+    
+    .pay-button {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 12px;
+      background: var(--button-color);
+      color: var(--button-text);
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    
+    .pay-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .pay-button:active:not(:disabled) {
+      opacity: 0.8;
+    }
+    
+    .status {
+      text-align: center;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 16px;
+      display: none;
+    }
+    
+    .status.success {
+      display: block;
+      background: rgba(49, 181, 69, 0.1);
+      color: var(--success-color);
+    }
+    
+    .status.error {
+      display: block;
+      background: rgba(229, 57, 53, 0.1);
+      color: var(--error-color);
+    }
+    
+    .status.loading {
+      display: block;
+      background: var(--card-bg);
+      color: var(--secondary-text);
+    }
+    
+    .status .icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
+    
+    .instructions {
+      text-align: center;
+      color: var(--secondary-text);
+      font-size: 13px;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="icon">💎</div>
+      <h1>EigoBot 購読</h1>
+      <p>30日間の英語レッスン</p>
+    </div>
+    
+    <div class="payment-card">
+      <div class="payment-row">
+        <span class="payment-label">プラン</span>
+        <span class="payment-value">30日間購読</span>
+      </div>
+      <div class="payment-row">
+        <span class="payment-label">金額</span>
+        <span class="payment-value amount" id="amount-display">-- TON</span>
+      </div>
+      <div class="payment-row">
+        <span class="payment-label">USD換算</span>
+        <span class="payment-value">≈ $1.00</span>
+      </div>
+    </div>
+    
+    <div id="connect-section">
+      <div id="ton-connect-button"></div>
+      <p class="instructions">Telegram Walletを接続して支払いを完了してください</p>
+    </div>
+    
+    <div id="pay-section" class="hidden">
+      <button class="pay-button" id="pay-btn" onclick="sendPayment()">
+        💎 支払いを確認
+      </button>
+      <p class="instructions">ボタンをクリックすると、ウォレットで支払いの確認が求められます</p>
+    </div>
+    
+    <div id="status-success" class="status success">
+      <div class="icon">✅</div>
+      <p><strong>支払い完了！</strong></p>
+      <p>購読が有効になりました</p>
+    </div>
+    
+    <div id="status-error" class="status error">
+      <div class="icon">❌</div>
+      <p><strong>支払いエラー</strong></p>
+      <p id="error-message">もう一度お試しください</p>
+    </div>
+    
+    <div id="status-loading" class="status loading">
+      <div class="icon">⏳</div>
+      <p>処理中...</p>
+    </div>
+  </div>
+  
+  <script>
+    // Get payment parameters from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const recipientAddress = urlParams.get('address') || '';
+    const amountNano = urlParams.get('amount') || '0';
+    const amountTON = urlParams.get('ton') || '0';
+    const paymentRef = urlParams.get('ref') || '';
+    const userId = urlParams.get('user') || '';
+    
+    // Display amount
+    document.getElementById('amount-display').textContent = `${parseFloat(amountTON).toFixed(4)} TON`;
+    
+    // Initialize Telegram WebApp
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+      
+      // Apply Telegram theme
+      if (tg.colorScheme === 'dark') {
+        document.body.classList.add('dark');
+      }
+      
+      // Use Telegram's theme colors
+      if (tg.themeParams) {
+        document.documentElement.style.setProperty('--bg-color', tg.themeParams.bg_color || '#ffffff');
+        document.documentElement.style.setProperty('--text-color', tg.themeParams.text_color || '#000000');
+        document.documentElement.style.setProperty('--button-color', tg.themeParams.button_color || '#3390ec');
+        document.documentElement.style.setProperty('--button-text', tg.themeParams.button_text_color || '#ffffff');
+        document.documentElement.style.setProperty('--secondary-text', tg.themeParams.hint_color || '#707579');
+      }
+    }
+    
+    // TON Connect configuration - specifically for Telegram Wallet
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl: 'https://eigobot.com/tonconnect-manifest.json',
+      buttonRootId: 'ton-connect-button',
+      uiPreferences: {
+        theme: tg?.colorScheme === 'dark' ? 'DARK' : 'LIGHT'
+      },
+      walletsListConfiguration: {
+        includeWallets: [
+          {
+            appName: "telegram-wallet",
+            name: "Telegram Wallet",
+            imageUrl: "https://wallet.tg/images/logo-288.png",
+            aboutUrl: "https://wallet.tg/",
+            universalLink: "https://t.me/wallet?attach=wallet",
+            bridgeUrl: "https://bridge.tonapi.io/bridge",
+            platforms: ["ios", "android", "macos", "windows", "linux"]
+          }
+        ]
+      },
+      actionsConfiguration: {
+        twaReturnUrl: 'https://t.me/DaiyEigoBot'
+      }
+    });
+    
+    // Listen for wallet connection
+    tonConnectUI.onStatusChange(wallet => {
+      if (wallet) {
+        console.log('Wallet connected:', wallet);
+        document.getElementById('connect-section').classList.add('hidden');
+        document.getElementById('pay-section').classList.remove('hidden');
+      } else {
+        document.getElementById('connect-section').classList.remove('hidden');
+        document.getElementById('pay-section').classList.add('hidden');
+      }
+    });
+    
+    // Send payment transaction
+    async function sendPayment() {
+      const payBtn = document.getElementById('pay-btn');
+      const loadingStatus = document.getElementById('status-loading');
+      const successStatus = document.getElementById('status-success');
+      const errorStatus = document.getElementById('status-error');
+      
+      // Reset status
+      loadingStatus.classList.remove('loading');
+      successStatus.classList.remove('success');
+      errorStatus.classList.remove('error');
+      loadingStatus.style.display = 'none';
+      successStatus.style.display = 'none';
+      errorStatus.style.display = 'none';
+      
+      // Show loading
+      payBtn.disabled = true;
+      payBtn.textContent = '処理中...';
+      loadingStatus.style.display = 'block';
+      
+      try {
+        // Create transaction
+        const transaction = {
+          validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes
+          messages: [
+            {
+              address: recipientAddress,
+              amount: amountNano,
+              payload: paymentRef // Comment/memo
+            }
+          ]
+        };
+        
+        console.log('Sending transaction:', transaction);
+        
+        // Send transaction request
+        const result = await tonConnectUI.sendTransaction(transaction);
+        
+        console.log('Transaction result:', result);
+        
+        // Success!
+        loadingStatus.style.display = 'none';
+        successStatus.style.display = 'block';
+        document.getElementById('pay-section').classList.add('hidden');
+        
+        // Close Mini App after delay
+        if (tg) {
+          setTimeout(() => {
+            tg.close();
+          }, 2000);
+        }
+        
+      } catch (error) {
+        console.error('Payment error:', error);
+        loadingStatus.style.display = 'none';
+        errorStatus.style.display = 'block';
+        document.getElementById('error-message').textContent = error.message || 'もう一度お試しください';
+        payBtn.disabled = false;
+        payBtn.textContent = '💎 支払いを確認';
+      }
+    }
+  </script>
+</body>
+</html>
+
