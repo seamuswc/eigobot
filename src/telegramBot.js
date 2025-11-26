@@ -770,11 +770,12 @@ ${priceMessage}
 
 ✅ 英語学習ボットの購読が開始されました！
 📅 購読は30日間有効です
-🎯 毎日のレッスンは日本時間9時に送信されます
-
-最初のレッスンです：`;
+🎯 毎日のレッスンは日本時間9時に送信されます`;
 
       await this.bot.sendMessage(chatId, successMessage);
+      
+      // Send immediate first lesson
+      await this.sendImmediateSentence(chatId, userId);
       
     } catch (error) {
       console.error('❌ Error in handlePaymentSuccess:', error);
