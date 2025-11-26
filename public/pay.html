@@ -205,9 +205,6 @@
       <div class="icon">✅</div>
       <p><strong>支払い完了！</strong></p>
       <p>購読が有効になりました</p>
-      <button class="pay-button" style="margin-top: 16px;" onclick="closeApp()">
-        ボットに戻る
-      </button>
     </div>
     
     <div id="status-error" class="status">
@@ -292,15 +289,6 @@
       }
     });
     
-    // Close the Mini App
-    function closeApp() {
-      if (tg) {
-        tg.close();
-      } else {
-        window.close();
-      }
-    }
-    
     // Send payment transaction
     async function sendPayment() {
       const payBtn = document.getElementById('pay-btn');
@@ -360,19 +348,16 @@
           // Continue anyway - payment was sent
         }
         
-        // Success! Hide everything and show success
+        // Success!
         loadingStatus.classList.remove('loading');
-        document.getElementById('pay-section').classList.add('hidden');
-        document.getElementById('connect-section').classList.add('hidden');
-        document.getElementById('ton-connect-button').style.display = 'none';
-        document.querySelector('.payment-card').style.display = 'none';
         successStatus.classList.add('success');
+        document.getElementById('pay-section').classList.add('hidden');
         
-        // Close Mini App quickly - don't let user see pending state
+        // Close Mini App after delay
         if (tg) {
           setTimeout(() => {
             tg.close();
-          }, 1500);
+          }, 2000);
         }
         
       } catch (error) {
