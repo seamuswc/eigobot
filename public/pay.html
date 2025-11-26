@@ -328,6 +328,29 @@
         
         console.log('Transaction result:', result);
         
+        // Notify the bot about successful payment
+        try {
+          const webhookResponse = await fetch('/webhook/payment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userId: userId,
+              chatId: userId, // In Telegram, chatId equals userId for private chats
+              paymentReference: paymentRef,
+              amount: amountNano,
+              transactionHash: result.boc || 'unknown'
+            })
+          });
+          
+          const webhookData = await webhookResponse.json();
+          console.log('Webhook response:', webhookData);
+        } catch (webhookError) {
+          console.error('Webhook error (non-fatal):', webhookError);
+          // Continue anyway - payment was sent
+        }
+        
         // Success!
         loadingStatus.style.display = 'none';
         successStatus.style.display = 'block';
