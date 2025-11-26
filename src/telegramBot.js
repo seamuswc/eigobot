@@ -328,9 +328,10 @@ class TelegramBotHandler {
       // Format price message with $1 USD equivalent
       const priceMessage = await priceService.formatPriceMessage(tonAmountForUSD, config.USDT_AMOUNT);
       
-      // Create Telegram Wallet deep link (uses tonkeeper: scheme which Telegram Wallet also supports)
-      // Format: https://app.tonkeeper.com/transfer/{address}?amount={nanoTON}&text={comment}
-      const telegramWalletLink = `https://app.tonkeeper.com/transfer/${config.TON_ADDRESS}?amount=${tonAmountNano}&text=${paymentReference}`;
+      // Create Telegram Wallet mini app deep link
+      // Format: https://t.me/wallet?startapp=<action> where action is base64 or specific format
+      // Using the transfer format for Telegram's @wallet bot
+      const telegramWalletLink = `https://t.me/wallet/transfer?address=${config.TON_ADDRESS}&amount=${tonAmountNano}&text=${encodeURIComponent(paymentReference)}`;
       console.log(`🔗 Telegram Wallet Link: ${telegramWalletLink}`);
       
       // Create payment buttons
