@@ -328,8 +328,14 @@ class TelegramBotHandler {
       // Format price message with $1 USD equivalent
       const priceMessage = await priceService.formatPriceMessage(tonAmountForUSD, config.USDT_AMOUNT);
       
+      // Create Telegram Wallet deep link (uses tonkeeper: scheme which Telegram Wallet also supports)
+      // Format: https://app.tonkeeper.com/transfer/{address}?amount={nanoTON}&text={comment}
+      const telegramWalletLink = `https://app.tonkeeper.com/transfer/${config.TON_ADDRESS}?amount=${tonAmountNano}&text=${paymentReference}`;
+      console.log(`🔗 Telegram Wallet Link: ${telegramWalletLink}`);
+      
       // Create payment buttons
       const keyboard = this.createKeyboard([
+        [{ text: `📱 Telegram Wallet (${tonAmountForUSD.toFixed(4)} TON)`, url: telegramWalletLink }],
         [{ text: `💎 ${tonAmountForUSD.toFixed(4)} TONを支払う（Tonkeeper）`, url: tonDeepLink }],
         [{ text: '💵 1 USDTを支払う（Tonkeeper）', url: tonUsdtDeepLink }],
         [{ text: '✅ 支払い済み', callback_data: `check_payment_${userId}` }],
