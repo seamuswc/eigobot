@@ -201,19 +201,19 @@
       <p class="instructions">ボタンをクリックすると、ウォレットで支払いの確認が求められます</p>
     </div>
     
-    <div id="status-success" class="status success">
+    <div id="status-success" class="status">
       <div class="icon">✅</div>
       <p><strong>支払い完了！</strong></p>
       <p>購読が有効になりました</p>
     </div>
     
-    <div id="status-error" class="status error">
+    <div id="status-error" class="status">
       <div class="icon">❌</div>
       <p><strong>支払いエラー</strong></p>
       <p id="error-message">もう一度お試しください</p>
     </div>
     
-    <div id="status-loading" class="status loading">
+    <div id="status-loading" class="status">
       <div class="icon">⏳</div>
       <p>処理中...</p>
     </div>
@@ -296,18 +296,15 @@
       const successStatus = document.getElementById('status-success');
       const errorStatus = document.getElementById('status-error');
       
-      // Reset status
+      // Hide all status indicators
       loadingStatus.classList.remove('loading');
       successStatus.classList.remove('success');
       errorStatus.classList.remove('error');
-      loadingStatus.style.display = 'none';
-      successStatus.style.display = 'none';
-      errorStatus.style.display = 'none';
       
       // Show loading
       payBtn.disabled = true;
       payBtn.textContent = '処理中...';
-      loadingStatus.style.display = 'block';
+      loadingStatus.classList.add('loading');
       
       try {
         // Create transaction (without payload for now - we'll verify by amount/time)
@@ -352,8 +349,8 @@
         }
         
         // Success!
-        loadingStatus.style.display = 'none';
-        successStatus.style.display = 'block';
+        loadingStatus.classList.remove('loading');
+        successStatus.classList.add('success');
         document.getElementById('pay-section').classList.add('hidden');
         
         // Close Mini App after delay
@@ -365,8 +362,8 @@
         
       } catch (error) {
         console.error('Payment error:', error);
-        loadingStatus.style.display = 'none';
-        errorStatus.style.display = 'block';
+        loadingStatus.classList.remove('loading');
+        errorStatus.classList.add('error');
         document.getElementById('error-message').textContent = error.message || 'もう一度お試しください';
         payBtn.disabled = false;
         payBtn.textContent = '💎 支払いを確認';

@@ -277,7 +277,7 @@ class TelegramBotHandler {
         return;
       }
       
-      // Calculate TON amount for $1 USD (equivalent to USDT amount)
+      // Calculate TON amount for $1 USD
       let tonAmountForUSD = await priceService.getTonAmountForUSD(1.0);
       
       if (!tonAmountForUSD) {
@@ -287,22 +287,16 @@ class TelegramBotHandler {
         tonAmountForUSD = 1.0 / fallbackPrice; // ~0.4 TON for $1
       }
       
-      const usdtAmount = Math.floor(config.USDT_AMOUNT * config.TON_CONVERSIONS.MICRO_USDT_TO_USDT); // Convert to microUSDT (6 decimals)
       const tonAmountNano = Math.floor(tonAmountForUSD * config.TON_CONVERSIONS.NANO_TO_TON); // Convert to nanoTON
       const paymentReference = `english-bot-${userId}-${Date.now()}`;
       
       console.log(`💎 Creating payment links for user ${userId}`);
       console.log(`💰 TON Amount: ${tonAmountForUSD.toFixed(4)} TON (≈ $1.00, ${tonAmountNano} nanoTON)`);
-      console.log(`💰 USDT Amount: ${config.USDT_AMOUNT} USDT (${usdtAmount} microUSDT)`);
       console.log(`🔗 Reference: ${paymentReference}`);
       
-      // Create TON deep link
+      // Create TON deep link for Tonkeeper
       const tonDeepLink = `ton://transfer/${config.TON_ADDRESS}?amount=${tonAmountNano}&text=${paymentReference}`;
       console.log(`🔗 TON Deep Link: ${tonDeepLink}`);
-      
-      // Create TON Native USDT deep link
-      const tonUsdtDeepLink = `ton://transfer/${config.TON_ADDRESS}?amount=${usdtAmount}&text=${paymentReference}&jetton=${config.USDT_CONTRACT_ADDRESS}`;
-      console.log(`🔗 TON USDT Deep Link: ${tonUsdtDeepLink}`);
       
       // Store payment reference for verification (store both amounts)
       // Use an array to store multiple pending payments per user to prevent clashes
@@ -315,7 +309,6 @@ class TelegramBotHandler {
         reference: paymentReference,
         amount: tonAmountNano,
         tonAmount: tonAmountForUSD,
-        usdtAmount: usdtAmount,
         timestamp: Date.now()
       };
       
@@ -324,9 +317,6 @@ class TelegramBotHandler {
       const recentPayments = existingPayments.slice(-3);
       
       this.pendingPayments.set(userId.toString(), recentPayments);
-      
-      // Format price message with $1 USD equivalent
-      const priceMessage = await priceService.formatPriceMessage(tonAmountForUSD, config.USDT_AMOUNT);
       
       // Create Telegram Wallet Mini App link with TON Connect
       // This opens a web app that uses TON Connect to connect to Telegram Wallet
@@ -339,8 +329,7 @@ class TelegramBotHandler {
         reply_markup: {
           inline_keyboard: [
             [{ text: `📱 Telegram Wallet (${tonAmountForUSD.toFixed(4)} TON)`, web_app: { url: paymentAppUrl } }],
-            [{ text: `💎 ${tonAmountForUSD.toFixed(4)} TONを支払う（Tonkeeper）`, url: tonDeepLink }],
-            [{ text: '💵 1 USDTを支払う（Tonkeeper）', url: tonUsdtDeepLink }],
+            [{ text: `💎 Tonkeeper (${tonAmountForUSD.toFixed(4)} TON)`, url: tonDeepLink }],
             [{ text: '✅ 支払い済み', callback_data: `check_payment_${userId}` }],
             [{ text: '🏠 メインメニュー', callback_data: 'back_to_main' }]
           ]
@@ -349,8 +338,9 @@ class TelegramBotHandler {
       
       const message = `💎 英語学習ボットを購読する
 
-${priceMessage}    
-📅 期間: 30日間の毎日のレッスン        
+💰 料金: ${tonAmountForUSD.toFixed(4)} TON (≈ $1.00)
+📅 期間: 30日間の毎日のレッスン
+
 🎯 含まれるもの:
 • 毎日の英語レッスン
 • 単語ごとの解説と発音
@@ -583,56 +573,6 @@ ${priceMessage}
                 if (paymentFound) break;
               }
               
-              // If TON payment not found, check TON USDT Jetton
-              if (!paymentFound) {
-                try {
-                  console.log(`🔍 Checking TON USDT Jetton transactions for reference: ${paymentData.reference}`);
-                  
-                  // Check for Jetton transfers in TON transactions
-                  for (const tx of transactions) {
-                    // Check if transaction has Jetton transfers
-                    if (tx.out_msgs && tx.out_msgs.length > 0) {
-                      for (const outMsg of tx.out_msgs) {
-                        // Check if this is a Jetton transfer
-                        if (outMsg.source && outMsg.destination && outMsg.decoded_body) {
-                          const body = outMsg.decoded_body;
-                          
-                          // Check if it's a Jetton transfer with our USDT contract
-                          if (body.jetton_transfer && 
-                              body.jetton_transfer.jetton_master_address === config.USDT_CONTRACT_ADDRESS) {
-                            
-                            // Check amount (1 USDT = 1,000,000 microUSDT)
-                            const expectedAmount = Math.floor(config.USDT_AMOUNT * config.TON_CONVERSIONS.MICRO_USDT_TO_USDT);
-                            const receivedAmount = parseInt(body.jetton_transfer.amount);
-                            
-                            console.log(`💰 Jetton transfer: received ${receivedAmount} microUSDT (expected ${expectedAmount})`);
-                            
-                            // Check if amount matches and message contains reference
-                            if (receivedAmount >= expectedAmount && 
-                                body.jetton_transfer.forward_ton_amount && 
-                                body.jetton_transfer.forward_payload) {
-                              
-                              // Check the forward payload for our reference (exact match when possible)
-                              const payload = body.jetton_transfer.forward_payload;
-                              if (payload && (payload.includes(paymentData.reference) || payload === paymentData.reference)) {
-                                console.log(`✅ TON USDT Jetton Payment found: ${paymentData.reference}`);
-                                paymentFound = true;
-                                foundPaymentData = paymentData;
-                                break;
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                    
-                    if (paymentFound) break;
-                  }
-                } catch (usdtError) {
-                  console.log('⚠️ TON USDT Jetton check error:', usdtError.message);
-                }
-              }
-              
               if (paymentFound) break;
             }
             
@@ -662,9 +602,9 @@ ${priceMessage}
           }
         }
       
-      // Only ONE message sent: success if either TON or USDT payment found, failure if neither found
+      // Send result message
       if (paymentFound && foundPaymentData) {
-        // Payment confirmed (either TON or USDT succeeded) - create subscription
+        // Payment confirmed - create subscription
         await database.createSubscription(userId.toString(), foundPaymentData.reference, config.SUBSCRIPTION_DAYS);
         
         // Remove ALL pending payments for this user (payment confirmed)
@@ -683,7 +623,7 @@ ${priceMessage}
         await this.sendImmediateSentence(chatId, userId);
         
       } else {
-        // Payment not found after 3 attempts (both TON and USDT checks failed)
+        // Payment not found after 3 attempts
         // Only one failure message sent
         await this.bot.sendMessage(chatId, `❌ 3回試行してもお支払いが見つかりませんでした。数分後にもう一度お試しください。`);
         }
