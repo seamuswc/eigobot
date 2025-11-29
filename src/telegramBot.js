@@ -654,12 +654,12 @@ class TelegramBotHandler {
     // Check if message contains Japanese script (hiragana, katakana, kanji)
     const hasJapaneseScript = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(msg.text);
     
-    if (hasJapaneseScript) {
-      console.log('🇯🇵 User typed in Japanese - not responding');
-      return; // Don't respond to Japanese text (they're practicing English)
+    if (!hasJapaneseScript) {
+      console.log('🇬🇧 User typed in English - not responding (probably practicing)');
+      return; // Don't respond to English text (they're practicing the lesson)
     }
     
-    // Show main menu buttons for any non-Japanese text message (same as /start)
+    // Show main menu buttons when user types Japanese (they want to navigate)
     const chatId = msg.chat.id;
     const userId = msg.from.id;
     const displayName = msg.from.first_name || msg.from.username || 'User';
